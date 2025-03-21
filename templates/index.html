@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COVID-19 Cases - Tamil Nadu</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>COVID-19 Cases - Tamil Nadu</h1>
+
+        <form method="GET" class="filter-form">
+            <label for="date">Filter by Date:</label>
+            <input type="date" id="date" name="date" value="{{ date_filter }}">
+
+            <label for="district">Select District:</label>
+            <select name="district" id="district">
+                <option value="">All Districts</option>
+                {% for col in columns %}
+                <option value="{{ col }}" {% if col == selected_district %}selected{% endif %}>{{ col|capitalize }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit">Filter</button>
+        </form>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    {% if date_filter %}
+                    <!-- Show districts as rows when date is selected -->
+                    <tr>
+                        <th>District</th>
+                        <th>Affected Cases</th>
+                    </tr>
+                    {% else %}
+                    <!-- Show normal table format when no date is selected -->
+                    <tr>
+                        <th>Date</th>
+                        {% if selected_district %}
+                            <th>{{ selected_district|capitalize }}</th>
+                        {% else %}
+                            {% for col in columns %}
+                            <th>{{ col|capitalize }}</th>
+                            {% endfor %}
+                        {% endif %}
+                    </tr>
+                    {% endif %}
+                </thead>
+                <tbody>
+                    {% if date_filter %}
+                        <!-- Show districts as rows -->
+                        {% for row in data %}
+                            {% for i in range(1, row|length) %}
+                            <tr>
+                                <td>{{ columns[i-1]|capitalize }}</td>
+                                <td>{{ row[i] }}</td>
+                            </tr>
+                            {% endfor %}
+                        {% endfor %}
+                    {% else %}
+                        <!-- Show normal format -->
+                        {% for row in data %}
+                        <tr>
+                            {% for value in row %}
+                            <td>{{ value }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
