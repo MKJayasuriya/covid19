@@ -25,52 +25,59 @@
             <button type="submit">Filter</button>
         </form>
 
-        <div class="table-container">
-            <table>
-                <thead>
-                    {% if date_filter %}
-                    <!-- Show districts as rows when date is selected -->
-                    <tr>
-                        <th>District</th>
-                        <th>Affected Cases</th>
-                    </tr>
-                    {% else %}
-                    <!-- Show normal table format when no date is selected -->
-                    <tr>
-                        <th>Date</th>
-                        {% if selected_district %}
-                            <th>{{ selected_district|capitalize }}</th>
+        <div class="content">
+            <!-- Left: Table -->
+            <div class="table-container">
+                <table>
+                    <thead>
+                        {% if date_filter %}
+                        <tr>
+                            <th>District</th>
+                            <th>Affected Cases</th>
+                        </tr>
                         {% else %}
-                            {% for col in columns %}
-                            <th>{{ col|capitalize }}</th>
-                            {% endfor %}
+                        <tr>
+                            <th>Date</th>
+                            {% if selected_district %}
+                                <th>{{ selected_district|capitalize }}</th>
+                            {% else %}
+                                {% for col in columns %}
+                                <th>{{ col|capitalize }}</th>
+                                {% endfor %}
+                            {% endif %}
+                        </tr>
                         {% endif %}
-                    </tr>
-                    {% endif %}
-                </thead>
-                <tbody>
-                    {% if date_filter %}
-                        <!-- Show districts as rows -->
-                        {% for row in data %}
-                            {% for i in range(1, row|length) %}
+                    </thead>
+                    <tbody>
+                        {% if date_filter %}
+                            {% for row in data %}
+                                {% for i in range(1, row|length) %}
+                                <tr>
+                                    <td>{{ columns[i-1]|capitalize }}</td>
+                                    <td>{{ row[i] }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        {% else %}
+                            {% for row in data %}
                             <tr>
-                                <td>{{ columns[i-1]|capitalize }}</td>
-                                <td>{{ row[i] }}</td>
+                                {% for value in row %}
+                                <td>{{ value }}</td>
+                                {% endfor %}
                             </tr>
                             {% endfor %}
-                        {% endfor %}
-                    {% else %}
-                        <!-- Show normal format -->
-                        {% for row in data %}
-                        <tr>
-                            {% for value in row %}
-                            <td>{{ value }}</td>
-                            {% endfor %}
-                        </tr>
-                        {% endfor %}
-                    {% endif %}
-                </tbody>
-            </table>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Right: Tamil Nadu Map Heatmap -->
+            {% if date_filter != "" %}
+            <div class="map-container">
+                <h2>COVID-19 Heatmap</h2>
+                <iframe src="{{ url_for('static', filename='maps/heatmap.html') }}" width="100%" height="700px"></iframe>
+            </div>
+            {% endif %}
         </div>
     </div>
 </body>

@@ -4,10 +4,12 @@ body {
     text-align: center;
     margin: 0;
     padding: 20px;
+    overflow: hidden;
 }
 
 .container {
     width: 80%;
+    height: 900px;
     margin: 0 auto;
     background: white;
     padding: 20px;
@@ -45,18 +47,36 @@ form button {
     cursor: pointer;
 }
 
+.content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: 20px;
+}
+
+.map-container {
+    width: 45%;
+}
+
+iframe {
+    border: none;
+}
+
 form button:hover {
     background-color: #0056b3;
 }
 
 .table-container {
-    overflow-x: auto;
+    overflow-y: scroll;
+    height: 750px;
+    min-width: 800px;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
+    max-width: 800px;
 }
 
 th,
