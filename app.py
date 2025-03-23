@@ -34,8 +34,7 @@ def get_columns():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute(
-        "SELECT column_name FROM information_schema.columns"
-        "WHERE table_name = 'covid_cases_tamil_nadu' AND column_name != 'date'"
+        "SELECT column_name FROM information_schema.columns WHERE table_name = 'covid_cases_tamil_nadu' AND column_name != 'date'"
     )
     columns = [row[0] for row in cur.fetchall()]
     cur.close()
@@ -97,7 +96,7 @@ def generate_tn_heatmap(date_filter, district):
     # Fetch the latest data or specific date
     if district != "" and date_filter:
         query = f"SELECT {district} FROM covid_cases_tamil_nadu"
-        query += "WHERE date = %s"
+        query += " WHERE date = %s"
         cur.execute(query, (date_filter,))
         data = cur.fetchone()
     elif date_filter:

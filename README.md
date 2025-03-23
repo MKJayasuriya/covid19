@@ -11,3 +11,5 @@ GRANT USAGE, CREATE ON SCHEMA public TO covid19;
 ALTER DATABASE covid19 SET TIMEZONE TO 'Asia/Kolkata';
 ALTER USER covid19 CREATEDB CREATEROLE LOGIN;
 ```
+
+I used randomly generated data only it not a real data
