@@ -1,10 +1,11 @@
 from flask import Flask, render_template, request
-import psycopg2
 import folium
-import os
-import pandas as pd
 import geopandas as gpd
 import json
+import matplotlib.pyplot as plt
+import os
+import pandas as pd
+import psycopg2
 
 DB_NAME = "covid19"
 USER = "covid19"
@@ -14,10 +15,10 @@ PORT = "5432"
 
 app = Flask(__name__)
 
-# Ensure static/maps directory exists
+# Ensure necessary directories exist
 os.makedirs("static/maps", exist_ok=True)
+os.makedirs("static/graphs", exist_ok=True)
 
-# Connect to PostgreSQL
 # Connect to PostgreSQL
 def get_db_connection():
     return psycopg2.connect(
@@ -32,7 +33,10 @@ def get_db_connection():
 def get_columns():
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute("SELECT column_name FROM information_schema.columns WHERE table_name = 'covid_cases_tamil_nadu' AND column_name != 'date'")
+    cur.execute(
+        "SELECT column_name FROM information_schema.columns"
+        "WHERE table_name = 'covid_cases_tamil_nadu' AND column_name != 'date'"
+    )
     columns = [row[0] for row in cur.fetchall()]
     cur.close()
     conn.close()
@@ -65,6 +69,24 @@ def get_covid_data(date_filter, district):
 
     return columns, data
 
+# Generate Graph
+def generate_graph(district):
+    conn = get_db_connection()
+    query = f"SELECT date, {district} FROM covid_cases_tamil_nadu ORDER BY date"
+    df = pd.read_sql_query(query, conn)
+    conn.close()
+    plt.figure(figsize=(10, 5))
+    plt.plot(df['date'], df[district], marker='o', linestyle='-')
+    plt.xlabel('Date')
+    plt.ylabel('Cases')
+    plt.title(f'COVID-19 Cases Over Time - {district}')
+    plt.xticks(rotation=45)
+    plt.grid()
+    graph_path = f"static/graphs/{district}.png"
+    plt.savefig(graph_path, bbox_inches='tight')
+    plt.close()
+    return graph_path
+
 # Generate Tamil Nadu Heatmap
 def generate_tn_heatmap(date_filter, district):
     conn = get_db_connection()
@@ -73,10 +95,9 @@ def generate_tn_heatmap(date_filter, district):
     columns = get_columns()
 
     # Fetch the latest data or specific date
-
     if district != "" and date_filter:
         query = f"SELECT {district} FROM covid_cases_tamil_nadu"
-        query += " WHERE date = %s"
+        query += "WHERE date = %s"
         cur.execute(query, (date_filter,))
         data = cur.fetchone()
     elif date_filter:
@@ -137,23 +158,32 @@ def generate_tn_heatmap(date_filter, district):
     # Save the map
     m.save("static/maps/heatmap.html")
 
-# Main Route
-@app.route("/", methods=["GET"])
+@app.route("/")
 def index():
     date_filter = request.args.get("date", "")
     district = request.args.get("district", "")
-
     columns, data = get_covid_data(date_filter, district)
 
     filter_columns = columns
-    if district != "":
+    if district:
         columns = [district]
-
+    graph_path = None
+    
     # Generate Tamil Nadu Heatmap
-    if date_filter != "":
+    if district:
+        graph_path = generate_graph(district)
+    if date_filter:
         generate_tn_heatmap(date_filter, district)
 
-    return render_template("index.html", data=data, columns=columns, filter_columns=filter_columns,  selected_district=district, date_filter=date_filter)
+    return render_template(
+        "index.html",
+        data=data,
+        columns=columns,
+        filter_columns=filter_columns,
+        selected_district=district,
+        date_filter=date_filter,
+        graph_path=graph_path
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)

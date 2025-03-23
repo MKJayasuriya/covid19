@@ -4,12 +4,10 @@ body {
     text-align: center;
     margin: 0;
     padding: 20px;
-    overflow: hidden;
 }
 
 .container {
     width: 80%;
-    height: 900px;
     margin: 0 auto;
     background: white;
     padding: 20px;
@@ -54,8 +52,8 @@ form button {
     margin-top: 20px;
 }
 
-.map-container {
-    width: 45%;
+.graph-map-container {
+    width: 70%;
 }
 
 iframe {
@@ -69,21 +67,20 @@ form button:hover {
 .table-container {
     overflow-y: scroll;
     height: 750px;
-    min-width: 800px;
 }
 
 .table-container-wdth {
     width: 100% !important;
 }
 
+.table-con-wdth {
+    width: 30% !important;
+}
+
 table {
     border-collapse: collapse;
     margin-top: 10px;
-    width: 800px;
-}
-
-.table-wdth {
-    width: 100% !important;
+    width: 95% !important;
 }
 
 th,
