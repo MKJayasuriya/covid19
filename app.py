@@ -66,14 +66,20 @@ def get_covid_data(date_filter, district):
     return columns, data
 
 # Generate Tamil Nadu Heatmap
-def generate_tn_heatmap(date_filter):
+def generate_tn_heatmap(date_filter, district):
     conn = get_db_connection()
     cur = conn.cursor()
 
     columns = get_columns()
 
     # Fetch the latest data or specific date
-    if date_filter:
+
+    if district != "" and date_filter:
+        query = f"SELECT {district} FROM covid_cases_tamil_nadu"
+        query += " WHERE date = %s"
+        cur.execute(query, (date_filter,))
+        data = cur.fetchone()
+    elif date_filter:
         query = "SELECT * FROM covid_cases_tamil_nadu WHERE date = %s"
         cur.execute(query, (date_filter,))
         data = cur.fetchone()
@@ -89,7 +95,10 @@ def generate_tn_heatmap(date_filter):
         return
 
     # Convert data to a dictionary
-    district_data = {columns[i]: data[i + 1] for i in range(len(columns))}
+    if district == "":
+        district_data = {columns[i]: data[i + 1] for i in range(len(columns))}
+    else:
+        district_data = {district: data[0]}
 
     # Load Tamil Nadu GeoJSON file
     geojson_path = "TamilNadu.geojson"
@@ -136,10 +145,15 @@ def index():
 
     columns, data = get_covid_data(date_filter, district)
 
-    # Generate Tamil Nadu Heatmap
-    generate_tn_heatmap(date_filter)
+    filter_columns = columns
+    if district != "":
+        columns = [district]
 
-    return render_template("index.html", data=data, columns=columns, selected_district=district, date_filter=date_filter)
+    # Generate Tamil Nadu Heatmap
+    if date_filter != "":
+        generate_tn_heatmap(date_filter, district)
+
+    return render_template("index.html", data=data, columns=columns, filter_columns=filter_columns,  selected_district=district, date_filter=date_filter)
 
 if __name__ == "__main__":
     app.run(debug=True)

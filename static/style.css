@@ -72,11 +72,18 @@ form button:hover {
     min-width: 800px;
 }
 
+.table-container-wdth {
+    width: 100% !important;
+}
+
 table {
-    width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
-    max-width: 800px;
+    width: 800px;
+}
+
+.table-wdth {
+    width: 100% !important;
 }
 
 th,

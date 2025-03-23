@@ -17,7 +17,7 @@
             <label for="district">Select District:</label>
             <select name="district" id="district">
                 <option value="">All Districts</option>
-                {% for col in columns %}
+                {% for col in filter_columns %}
                 <option value="{{ col }}" {% if col == selected_district %}selected{% endif %}>{{ col|capitalize }}</option>
                 {% endfor %}
             </select>
@@ -27,8 +27,8 @@
 
         <div class="content">
             <!-- Left: Table -->
-            <div class="table-container">
-                <table>
+            <div class="table-container {% if date_filter == "" %}table-container-wdth{% endif %}">
+                <table {% if date_filter == "" %}class="table-wdth"{% endif %}>
                     <thead>
                         {% if date_filter %}
                         <tr>
